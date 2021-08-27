@@ -234,6 +234,14 @@ export class NotificationCCAPI extends PhysicalCCAPI {
 			NotificationCommand.SupportedGet,
 		);
 
+		if (this.getNodeUnsafe()?.deviceConfig?.compat.?alarmMapping) {
+			// An event is considred supported if it appears in any mapping statement
+			// TODO: dedupe this
+			return this.getNodeUnsafe()?.deviceConfig?.compat?.alarmMapping.map(
+					(m) => { 
+						return m.to.notificationType;
+					});
+		}
 		const cc = new NotificationCCSupportedGet(this.driver, {
 			nodeId: this.endpoint.nodeId,
 			endpoint: this.endpoint.index,
@@ -258,6 +266,23 @@ export class NotificationCCAPI extends PhysicalCCAPI {
 			NotificationCommand,
 			NotificationCommand.EventSupportedGet,
 		);
+
+		// TODO: replace with equivelant of hasOwnProperty
+		if (this.getNodeUnsafe()?.deviceConfig?.compat.?alarmMapping) {
+			// TODO: What type should this be?
+			var supportedEvents;
+			const mapping = this.getNodeUnsafe()?.deviceConfig?.compat?.alarmMapping;
+			// An event is considred supported if it appears in any mapping statement
+			return this.getNodeUnsafe()?.deviceConfig?.compat?.alarmMapping.filter(
+				(m) => {
+					return m.to.notificationType == notificationType;
+				}
+			).map(
+				(m) => { 
+					return m.to.notificationEvent;
+				}
+			);
+		}
 
 		const cc = new NotificationCCEventSupportedGet(this.driver, {
 			nodeId: this.endpoint.nodeId,
